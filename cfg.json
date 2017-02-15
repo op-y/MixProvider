@@ -1,0 +1,10 @@
+{
+    "addr": ":8080",
+    "log": "mix_provider.log",
+    "weixin_enabled": true,
+    "weixin_url": "http://localhost:8081/weixin",
+    "sms_enabled": true,
+    "sms_url": "http://localhost:8082/sms",
+    "mail_enabled": true,
+    "mail_url": "http://localhost:8083/mail"
+}
