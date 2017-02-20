@@ -97,6 +97,7 @@ func msg(w http.ResponseWriter, r *http.Request) {
 
         if len(r.Form.Get("content"))==0 {
             logger.Printf("!!!!==msg== <result:%s>", "content is empty")
+            w.WriteHeader(http.StatusBadRequest)
             fmt.Fprintf(w, "content is empty")
             return
         } else {
@@ -105,6 +106,7 @@ func msg(w http.ResponseWriter, r *http.Request) {
 
         if len(r.Form.Get("tos"))==0 {
             logger.Printf("!!!!==msg== <result:%s>", "tos is empty")
+            w.WriteHeader(http.StatusBadRequest)
             fmt.Fprintf(w, "tos is empty")
             return
         } else {
@@ -134,6 +136,7 @@ func msg(w http.ResponseWriter, r *http.Request) {
         }
     } else {
         logger.Printf("!!!!==msg== <result:%s>", "wrong method")
+        w.WriteHeader(http.StatusMethodNotAllowed)
         fmt.Fprintf(w, "wrong method")
     }
 }
@@ -148,6 +151,7 @@ func mail(w http.ResponseWriter, r *http.Request) {
 
         if len(r.Form.Get("content"))==0 {
             logger.Printf("!!!!==mail== <result:%s>", "content is empty")
+            w.WriteHeader(http.StatusBadRequest)
             fmt.Fprintf(w, "content is empty")
             return
         } else {
@@ -156,6 +160,7 @@ func mail(w http.ResponseWriter, r *http.Request) {
 
         if len(r.Form.Get("subject"))==0 {
             logger.Printf("!!!!==mail== <result:%s>", "subject is empty")
+            w.WriteHeader(http.StatusBadRequest)
             fmt.Fprintf(w, "subject is empty")
             return
         } else {
@@ -164,6 +169,7 @@ func mail(w http.ResponseWriter, r *http.Request) {
 
         if len(r.Form.Get("tos"))==0 {
             logger.Printf("!!!!==mail== <result:%s>", "tos is empty")
+            w.WriteHeader(http.StatusBadRequest)
             fmt.Fprintf(w, "tos is empty")
             return
         } else {
@@ -175,14 +181,17 @@ func mail(w http.ResponseWriter, r *http.Request) {
             result, err := sendMail(config.MailUrl, content, subject, tos)
             if err != nil {
                 logger.Printf("<<<<==mail== <result:%s>", err.Error())
+                w.WriteHeader(http.StatusInternalServerError)
                 fmt.Fprintf(w, err.Error())
             } else {
                 logger.Printf("<<<<==mail== <result:%s>", result)
+                w.WriteHeader(http.StatusOK)
                 fmt.Fprintf(w, result)
             }
         }
     } else {
         logger.Printf("!!!!==mail== <result:%s>", "wrong method")
+        w.WriteHeader(http.StatusMethodNotAllowed)
         fmt.Fprintf(w, "wrong method")
     }
 }
