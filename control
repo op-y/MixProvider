@@ -1,8 +1,9 @@
 WORKSPACE=$(cd $(dirname $0)/; pwd)
 cd ${WORKSPACE}
 
-app=mix_provider
+app=provider
 pidfile=${app}.pid
+logfile=${app}.log
 
 function check_pid() {
     if [[ -f ${pidfile} ]];then
@@ -24,7 +25,7 @@ function start() {
         return 1
     fi
 
-    nohup ./${app} &>/dev/null &
+    nohup ./${app} &>${logfile} &
     echo $! > ${pidfile}
     echo "${app} started..., pid=$!"
 }
@@ -43,7 +44,7 @@ function restart() {
 }
 
 function help() {
-    echo "$0 pid|reload|build|pack|packbin|start|stop|restart"
+    echo "$0 pid|start|stop|restart"
 }
 
 function pid() {
