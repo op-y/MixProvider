@@ -28,7 +28,7 @@ func wechatGo(content string) (string, error) {
     secret := "iamasecret"
 
     // get access token
-    accessTokenURL := "https://127.0.0.1:80/token"
+    accessTokenURL := "https://127.0.0.1:80/xxx/gettoken?corpid="+corperateID+"&corpsecret="+secret
 
     accessTokenResponse, err := http.Get(accessTokenURL)
     if err != nil {
