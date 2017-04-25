@@ -151,6 +151,7 @@ func mail(w http.ResponseWriter, r *http.Request) {
         log.Printf("<<<<==mail== <result: %s>", "Mail is not enabled")
         w.WriteHeader(http.StatusOK)
         fmt.Fprintf(w, "Mail is not enabled!")
+        return
     }
 
     if r.Method == "POST" {
