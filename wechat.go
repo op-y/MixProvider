@@ -5,6 +5,7 @@ import (
     "encoding/json"
     "io/ioutil"
     "net/http"
+    "net/url"
 )
 
 type Token struct {
@@ -47,15 +48,20 @@ func wechatGo(content string) (string, error) {
     // send wechat message
     sendMessageURL := "https://127.0.0.1:80/message/send"
     
-    warning := &Warning{Content: content}
+    encodedContent := url.QueryEscape(content)
+    warning := &Warning{Content: encodedContent}
     data := &WechatData{ToParty: "3", AgentID: "2", MessageType: "text", Text: warning}
     dataJSON, err := json.Marshal(data)
     if err != nil {
         return "", err
     }
+    decodedDataJSON, err := url.QueryUnescape(string(dataJSON))
+    if err != nil {
+        return "", err
+    }
 
     client := &http.Client{}
-    sendMessageRequest, err := http.NewRequest("POST", sendMessageURL, bytes.NewReader(dataJSON))
+    sendMessageRequest, err := http.NewRequest("POST", sendMessageURL, bytes.NewReader([]byte(decodedDataJSON)))
     sendMessageResponse, err := client.Do(sendMessageRequest)
     defer sendMessageResponse.Body.Close()
 
