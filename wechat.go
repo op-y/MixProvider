@@ -25,11 +25,11 @@ type WechatData struct {
 }
 
 func wechatGo(content string) (string, error) {
-    corperateID := "xxx"
-    secret := "iamasecret"
+    corperateID := "yourID"
+    secret := "yourSecret"
 
     // get access token
-    accessTokenURL := "https://127.0.0.1:80/xxx/gettoken?corpid="+corperateID+"&corpsecret="+secret
+    accessTokenURL := "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid="+corperateID+"&corpsecret="+secret
 
     accessTokenResponse, err := http.Get(accessTokenURL)
     if err != nil {
@@ -46,11 +46,11 @@ func wechatGo(content string) (string, error) {
     }
 
     // send wechat message
-    sendMessageURL := "https://127.0.0.1:80/message/send"
+    sendMessageURL := "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="+accessToken.AccessToken
     
     encodedContent := url.QueryEscape(content)
     warning := &Warning{Content: encodedContent}
-    data := &WechatData{ToParty: "3", AgentID: "2", MessageType: "text", Text: warning}
+    data := &WechatData{ToParty: "yourTargetParty", AgentID: "yourAgentID", MessageType: "text", Text: warning}
     dataJSON, err := json.Marshal(data)
     if err != nil {
         return "", err
@@ -70,5 +70,6 @@ func wechatGo(content string) (string, error) {
         return "", err
     }
     message := string(body)
+
     return message, nil
 }

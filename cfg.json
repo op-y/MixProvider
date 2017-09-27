@@ -1,14 +1,9 @@
 {
-    "addr": ":80",
-    "mail_enabled": false,
-    "mail_channel": "relayer",
-    "mail_relayer_url": "http://127.0.0.1:8080/mail",
+    "addr": ":8080",
     "wechat_enabled": true,
-    "wechat_channel": "relayer",
-    "wechat_relayer_url": "http://127.0.0.1:8080/wechat",
+    "wechat_channel": "wechat",
+    "wechat_relayer_url": "http://ip:port/weixin",
     "sms_enabled": true,
     "sms_channel": "yuntongxun",
-    "sms_priority": "[P1]",
-    "sms_skip": "10086",
     "sms_blacklist":[]
 }

@@ -22,6 +22,9 @@ MixProvider 是按照Open Falcon监控系统短信报警接口规范开发的Pro
 ## 使用方法
 1. git clone https://github.com/op-y/MixProvider.git
 2. cd MixProvider
-3. go build -o provider
+3. go build -o mix-provider
 4. 根据实际情况修改cfg.json配置
 5. ./control start
+
+## 修改历史
+* 2017/9/27 根据业务需要，将将短信和微信接口分离，去掉了邮件接口

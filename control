@@ -1,7 +1,7 @@
 WORKSPACE=$(cd $(dirname $0)/; pwd)
 cd ${WORKSPACE}
 
-app=provider
+app=mix-provider
 pidfile=${app}.pid
 logfile=${app}.log
 

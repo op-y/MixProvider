@@ -4,15 +4,23 @@ import (
     "strings"
 )
 
-func priorityFilter(content string, priority string) bool {
-    return strings.Contains(content, priority)
-}
+func priorityFilter(content string) (bool, bool) {
+    p0 := "[P0]"
+    p1 := "[P1]"
+    p2 := "[P2]"
 
-func numberFilter(tos string, skipNumber string) bool {
-    if tos == skipNumber {
-        return false
+    hasWechat := strings.Contains(content, p0)
+    hasSMS := strings.Contains(content, p1)
+    hasBoth := strings.Contains(content, p2)
+
+    if hasWechat {
+        return true, false
+    } else if hasSMS {
+        return false, true
+    } else if hasBoth {
+        return true, true
     } else {
-        return true
+        return true, false
     }
 }
 

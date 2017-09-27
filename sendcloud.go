@@ -10,10 +10,10 @@ import (
 )
 
 func sendcloudGo(tos string, content string) (string, error) {
-    smsUrl := "http://127.0.0.1:8080/xxx/send"
-    smsKey := "xxx"
-    smsUser := "username"
-    smsTemplateId := "999"
+    smsUrl := "http://host:port/api/path"
+    smsKey := "yourKey"
+    smsUser := "yourUsername"
+    smsTemplateId := "yourTemplateId"
 
     // replace com with c0m
     message := strings.Replace(content, ".com", ".c0m", -1)

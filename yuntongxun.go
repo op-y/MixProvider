@@ -21,11 +21,11 @@ type YuntongxunData struct {
 }
 
 func yuntongxunGo(tos string, content string) (string, error) {
-    baseURL := "https://127.0.0.1:80"
-    accountSID := "999"
-    applicationID := "001"
-    templateID := 123456
-    token := "token"
+    baseURL := "https://ip:port"
+    accountSID := "yourAccountSID"
+    applicationID := "yourApplicationID"
+    templateID := 00000
+    token := "yourToken"
     
     // process timestamp
     timestamp := time.Now().Format("20060102150405")
@@ -38,7 +38,7 @@ func yuntongxunGo(tos string, content string) (string, error) {
     signature := strings.ToUpper(hex.EncodeToString(md5Ctx.Sum(nil)))
 
     // generate reuqeust url
-    requestURL := baseURL+"/xxx/Accounts/"+accountSID+"/SMS/TemplateSMS?sig="+signature
+    requestURL := baseURL+"/0000-00-00/Accounts/"+accountSID+"/SMS/TemplateSMS?sig="+signature
 
     // prepare request body
     contents := []string{content}
