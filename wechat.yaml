@@ -1,0 +1,13 @@
+user:
+  - name: "user1"
+    tel: "13900001111"
+    team: "sre"
+    toparty: "1"
+  - name: "user2"
+    tel: "15966666666"
+    team: "sre"
+    toparty: "1"
+  - name: "user3"
+    tel: "18888888888"
+    team: "dba"
+    toparty: "2"

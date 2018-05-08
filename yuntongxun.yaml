@@ -1,0 +1,7 @@
+media:
+  - key: "host"
+    filename: "hostFault.wav"
+    description: "host fault"
+  - key: "net"
+    filename: "netFault.wav"
+    description: "network fault"

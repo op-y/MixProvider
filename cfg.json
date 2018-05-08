@@ -1,9 +1,0 @@
-{
-    "addr": ":8080",
-    "wechat_enabled": true,
-    "wechat_channel": "wechat",
-    "wechat_relayer_url": "http://ip:port/weixin",
-    "sms_enabled": true,
-    "sms_channel": "yuntongxun",
-    "sms_blacklist":[]
-}

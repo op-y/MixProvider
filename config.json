@@ -1,0 +1,36 @@
+{
+    "addr": ":8080",
+    "wechat_enabled": true,
+    "sms_enabled": true,
+    "tel_enabled": true,
+    "email_enabled": true,
+    "wechat": {
+        "corpid":"your corporate id",
+        "secret": "your secret",
+        "agentid": "your agent id",
+        "toparty": "your party id",
+        "grouping": true
+    },
+    "sms": {
+        "accid": "your account id",
+        "token": "your token",
+        "appid": "your application id",
+        "tplid": 666666
+    },
+    "tel": {
+        "accid": "your account id",
+        "token": "your token",
+        "appid": "your application id",
+        "display_num": "01012345678",
+        "media_name": "music.wav",
+        "play_times": "1"
+    },
+    "email": {
+        "ip":"127.0.0.1",
+        "port": 25,
+        "username": "user@example.com",
+        "password": "your password",
+        "ops": "sre@example.com"
+    },
+    "blacklist":["10086", "10000", "10010"]
+}
