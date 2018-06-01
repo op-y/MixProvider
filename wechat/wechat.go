@@ -13,6 +13,7 @@ import (
 
     "mix-provider/config"
     "mix-provider/utils"
+    "mix-provider/yuntongxun"
 
     "gopkg.in/yaml.v2"
 )
@@ -154,7 +155,16 @@ func SendWechatMessage(token *Token, toparty string, agentid string, content str
     timeout := time.Second * 5
     client := &http.Client{Timeout: timeout}
     sendMessageRequest, err := http.NewRequest("POST", sendMessageURL, bytes.NewReader([]byte(decodedDataJSON)))
+    if err != nil {
+        log.Printf("fail to create request: %s", err.Error())
+        return nil, err
+    }
+
     sendMessageResponse, err := client.Do(sendMessageRequest)
+    if err != nil {
+        log.Printf("fail to call the wechat API: %s", err.Error())
+        return nil, err
+    }
     defer sendMessageResponse.Body.Close()
 
     body, err := ioutil.ReadAll(sendMessageResponse.Body)
@@ -185,10 +195,14 @@ func WechatGo(corperateID string, secret string, agentID string, tos string, con
         log.Printf("fail to send wechat message: %s", err.Error())
         return err
     }
+    log.Printf("call wechat API successfully: %d %s", response.ErrCode, response.ErrMsg)
 
-    // TODO:: handling error except 40014
     // retry to send wechat message if token is invalid
-    if response.ErrCode == 40014 {
+    switch response.ErrCode {
+    case 0:
+        log.Printf("send wechat message successfully: %d %s", response.ErrCode, response.ErrMsg)
+        return nil
+    case 40014, 42001:
         log.Printf("wechat access token expire, try to update it: %d %s", response.ErrCode, response.ErrMsg)
         tokenNew, err := GetWechatToken(corperateID, secret)
         if err != nil {
@@ -206,7 +220,22 @@ func WechatGo(corperateID string, secret string, agentID string, tos string, con
             log.Printf("fail to REsend wechat message: %s", err.Error())
             return err
         }
-        log.Printf("update wechat access token and send wechat message successfully: %d %s", responseRetry.ErrCode, responseRetry.ErrMsg)
+        log.Printf("call wechat API successfully: %d %s", responseRetry.ErrCode, responseRetry.ErrMsg)
+        return nil
+    case 45009:
+        log.Printf("API freq out of limit, try to send SMS: %d %s", response.ErrCode, response.ErrMsg)
+        if config.CFG.SmsEnabled {
+            warning := content + "[Out of Wechat Limit]"
+            if err := yuntongxun.YuntongxunSmsGo(config.CFG.Sms.AccID, config.CFG.Sms.AppID, config.CFG.Sms.Token, config.CFG.Sms.TplID, tos, warning); err != nil {
+                log.Printf("fail to wechat2sms: %s", err.Error())
+                return err
+            }
+            log.Printf("wechat2sms successfully")
+            return nil
+        }
+        return nil
+    default:
+        log.Printf("unexpect wechat API response: %d %s", response.ErrCode, response.ErrMsg)
         return nil
     }
     return nil

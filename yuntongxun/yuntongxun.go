@@ -126,6 +126,10 @@ func YuntongxunSmsGo(accountSID string, applicationID string, token string, temp
     request.Header.Add("Content-Length",strconv.Itoa(contentLength))
     request.Header.Add("Authorization", authorization)
     response, err := client.Do(request)
+    if err != nil {
+        log.Printf("fail to send message to %s: %s", tos, err.Error())
+        return err
+    }
     defer response.Body.Close()
     body, err := ioutil.ReadAll(response.Body)
     if err != nil {
@@ -192,6 +196,10 @@ func YuntongxunTelGo(accountSID string, applicationID string, token string, disp
         request.Header.Add("Content-Length",strconv.Itoa(contentLength))
         request.Header.Add("Authorization", authorization)
         response, err := client.Do(request)
+        if err != nil {
+            log.Printf("fail to call %s: %s", to, err.Error())
+            return err
+        }
         defer response.Body.Close()
         body, err := ioutil.ReadAll(response.Body)
         if err != nil {

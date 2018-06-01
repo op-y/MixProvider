@@ -2,7 +2,6 @@
     "addr": ":8080",
     "wechat_enabled": true,
     "sms_enabled": true,
-    "tel_enabled": true,
     "email_enabled": true,
     "wechat": {
         "corpid":"your corporate id",

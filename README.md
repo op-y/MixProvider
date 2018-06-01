@@ -25,8 +25,8 @@ MixProvider 是按照Open Falcon监控系统短信报警接口规范开发的Pro
 * yuntongxun.yaml          -- 容联云通讯媒体文件配置
 
 ## 使用方法
-1. git clone https://github.com/op-y/MixProvider.git
-2. cd MixProvider
+1. git clone https://github.com/op-y/MixProvider.git mix-provider
+2. cd mix-provider
 3. go build -o mix-provider
 4. 根据实际情况修改config.json/wechat.yaml/yuntongxun.yaml配置
 5. ./control start
