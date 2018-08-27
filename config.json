@@ -5,8 +5,10 @@
     "email_enabled": true,
     "wechat": {
         "corpid":"your corporate id",
-        "secret": "your secret",
-        "agentid": "your agent id",
+        "alarm_secret": "your secret",
+        "alarm_agentid": "your agent id",
+        "deploy_secret": "your secret",
+        "deploy_agentid": "your agent id",
         "toparty": "your party id",
         "grouping": true
     },

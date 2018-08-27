@@ -3,6 +3,7 @@ package wechat
 import (
     "bytes"
     "encoding/json"
+    "errors"
     "io/ioutil"
     "log"
     "net/http"
@@ -34,6 +35,14 @@ type Token struct {
     ExpiresIn      int       `json:"expires_in"`
 }
 
+type Application struct {
+    CorperateID    string
+    Secret         string
+    AgentID        string    
+    AppToken       *Token
+    Lock           *sync.RWMutex
+}
+
 type WechatData struct {
     ToParty        string      `json:"toparty"`
     AgentID        string      `json:"agentid"`
@@ -53,25 +62,44 @@ type WechatResponse struct {
     InvalidTag      string    `json:"invalidtag"`
 }
 
-var WC *Contacts
-var WT *Token
-var WTL *sync.RWMutex
+var UnknownTypeError = errors.New("unknown wechat message type")
+var WechatContracts *Contacts
+var AlarmApplication *Application
+var DeployApplication *Application
+
 
 func init() {
-    WC = LoadWechatContacts()
-    if WC == nil {
+    WechatContracts = LoadWechatContacts()
+    if WechatContracts == nil {
         panic("fail to load wechat contacts mapping configuration")
     }
 
-    WTL = new(sync.RWMutex)
-    token, err := GetWechatToken(config.CFG.Wechat.CorpID, config.CFG.Wechat.Secret)
-    if err != nil {
-        panic("fail to initialize wechat access token")
+    AlarmApplication = &Application{
+        CorperateID:config.CFG.Wechat.CorpID,
+        Secret:config.CFG.Wechat.AlarmSecret, 
+        AgentID:config.CFG.Wechat.AlarmAgentID,
+        AppToken:nil,
+        Lock:new(sync.RWMutex)}
+
+    DeployApplication = &Application{
+        CorperateID:config.CFG.Wechat.CorpID,
+        Secret:config.CFG.Wechat.DeploySecret, 
+        AgentID:config.CFG.Wechat.DeployAgentID,
+        AppToken:nil,
+        Lock:new(sync.RWMutex)}
+
+    if err := AlarmApplication.GetWechatToken(); err != nil {
+        log.Printf("fail to initialize alarm application token: %s", err.Error())
+        panic("fail to initialize alarm application token")
     }
-    WTL.Lock()
-    WT = token
-    WTL.Unlock()
-    log.Printf("init WT: %v", WT)
+
+    if err := DeployApplication.GetWechatToken(); err != nil {
+        log.Printf("fail to initialize deploy application token: %s", err.Error())
+        panic("fail to initialize deploy application token")
+    }
+
+    log.Printf("init alarm application: %v", AlarmApplication)
+    log.Printf("init deploy application: %v", DeployApplication)
 }
 
 // Load falcon/wechat users mapping from wechat.yaml
@@ -97,7 +125,7 @@ func GetWechatParty(tos string) string {
     s := utils.NewSet()
     toList := strings.Split(tos, ",")
     for _, to := range toList {
-        for _, user := range WC.User {
+        for _, user := range WechatContracts.User {
             if to == user.Tel {
                 s.Add(user.ToParty)
             }
@@ -107,39 +135,43 @@ func GetWechatParty(tos string) string {
 }
 
 // Get wechat access token through wechat API
-func GetWechatToken(corperateID string, secret string) (*Token, error) {
-    accessTokenURL := "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid="+corperateID+"&corpsecret="+secret
+func (app *Application) GetWechatToken() error {
+    accessTokenURL := "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid="+app.CorperateID+"&corpsecret="+app.Secret
 
     timeout := time.Second * 5
     client := &http.Client{Timeout: timeout}
     accessTokenResponse, err := client.Get(accessTokenURL)
     if err != nil {
         log.Printf("fail to get wechat access token: %s", err.Error())
-        return nil, err
+        return err
     }
     defer accessTokenResponse.Body.Close()
 
     body, err := ioutil.ReadAll(accessTokenResponse.Body)
     if err != nil {
         log.Printf("fail to read response: %s", err.Error())
-        return nil, err
+        return err
     }
 
     accessToken := &Token{}
     if err := json.Unmarshal(body, accessToken); err != nil {
         log.Printf("fail to unmarshal access token: %s", err.Error())
-        return nil, err
+        return err
     }
-    return accessToken, nil
+
+    app.Lock.Lock()
+    app.AppToken = accessToken
+    app.Lock.Unlock()
+    return nil
 }
 
 // Send wechat message through wechat API
-func SendWechatMessage(token *Token, toparty string, agentid string, content string) (*WechatResponse, error) {
-    sendMessageURL := "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="+token.AccessToken
+func (app *Application) SendWechatMessage(toparty string, content string) (*WechatResponse, error) {
+    sendMessageURL := "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token="+app.AppToken.AccessToken
     
     encodedContent := url.QueryEscape(content)
     warning := &Warning{Content: encodedContent}
-    data := &WechatData{ToParty: toparty, AgentID: agentid, MessageType: "text", Text: warning}
+    data := &WechatData{ToParty: toparty, AgentID: app.AgentID, MessageType: "text", Text: warning}
 
     dataJSON, err := json.Marshal(data)
     if err != nil {
@@ -183,14 +215,17 @@ func SendWechatMessage(token *Token, toparty string, agentid string, content str
 }
 
 // The entrance of wechat
-func WechatGo(corperateID string, secret string, agentID string, tos string, content string) error {
+func (app *Application) WechatGo(tos string, content string) error {
     toparty := config.CFG.Wechat.Toparty
     if config.CFG.Wechat.Grouping {
-        toparty = GetWechatParty(tos)
+        party := GetWechatParty(tos)
+        if "" != party {
+            toparty = party
+        }  
     }
 
     // send wechat message
-    response, err := SendWechatMessage(WT, toparty, agentID, content)
+    response, err := app.SendWechatMessage(toparty, content)
     if err != nil {
         log.Printf("fail to send wechat message: %s", err.Error())
         return err
@@ -204,22 +239,18 @@ func WechatGo(corperateID string, secret string, agentID string, tos string, con
         return nil
     case 40014, 42001:
         log.Printf("wechat access token expire, try to update it: %d %s", response.ErrCode, response.ErrMsg)
-        tokenNew, err := GetWechatToken(corperateID, secret)
-        if err != nil {
-            log.Printf("fail to get wechat access token: %s", err.Error())
+
+        if err := app.GetWechatToken(); err != nil {
+            log.Printf("fail to update wechat access token: %s", err.Error())
             return err
         }
-        log.Printf("token before: %v", WT)
-        WTL.Lock()
-        WT = tokenNew
-        WTL.Unlock()
-        log.Printf("token after: %v", WT)
 
-        responseRetry, err := SendWechatMessage(WT, toparty, agentID, content)
+        responseRetry, err := app.SendWechatMessage(toparty, content)
         if err != nil {
             log.Printf("fail to REsend wechat message: %s", err.Error())
             return err
         }
+
         log.Printf("call wechat API successfully: %d %s", responseRetry.ErrCode, responseRetry.ErrMsg)
         return nil
     case 45009:

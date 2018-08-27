@@ -19,11 +19,13 @@ type Config struct {
 }
 
 type WechatConfig struct {
-    CorpID      string    `json:"corpid"`
-    Secret      string    `json:"secret"`
-    AgentID     string    `json:"agentid"`
-    Toparty     string    `json:"toparty"`
-    Grouping    bool      `json:"grouping"`
+    CorpID           string    `json:"corpid"`
+    AlarmSecret      string    `json:"alarm_secret"`
+    AlarmAgentID     string    `json:"alarm_agentid"`
+    DeploySecret     string    `json:"deploy_secret"`
+    DeployAgentID    string    `json:"deploy_agentid"`
+    Toparty          string    `json:"toparty"`
+    Grouping         bool      `json:"grouping"`
 }
 
 type SmsConfig struct {

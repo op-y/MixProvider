@@ -127,6 +127,7 @@ func Message(w http.ResponseWriter, r *http.Request) {
             log.Printf("<<<<==sms== <result:%s>", err.Error())
             w.WriteHeader(http.StatusInternalServerError)
             fmt.Fprintf(w, err.Error())
+            return
         }
         log.Println("<<<<==sms== ok!")
         w.WriteHeader(http.StatusOK)
@@ -135,6 +136,61 @@ func Message(w http.ResponseWriter, r *http.Request) {
         log.Printf("!!!!==msg== <result:%s>", "wrong method")
         w.WriteHeader(http.StatusMethodNotAllowed)
         fmt.Fprintf(w, "wrong method")
+        return
+    }
+}
+
+// Handler("/deploy")
+func Deploy(w http.ResponseWriter, r *http.Request) {
+    if r.Method == "POST" {
+        var tos     string
+        var content string
+
+        r.ParseForm()
+
+        if len(r.Form.Get("tos"))==0 {
+            log.Printf("!!!!==deploy== <result:%s>", "tos is empty")
+            w.WriteHeader(http.StatusBadRequest)
+            fmt.Fprintf(w, "tos is empty")
+            return
+        } else {
+            tos = r.Form.Get("tos")
+        }
+
+        if len(r.Form.Get("content"))==0 {
+            log.Printf("!!!!==deploy== <result:%s>", "content is empty")
+            w.WriteHeader(http.StatusBadRequest)
+            fmt.Fprintf(w, "content is empty")
+            return
+        } else {
+            content = r.Form.Get("content")
+        }
+
+        log.Printf("==deploy==>>>> <tos:%s><content:%s>", tos, content)
+
+        // send wechat
+        if ! config.CFG.WechatEnabled {
+            log.Printf("<<<<==wechat== <result:%s>", "wechat is not enabled")
+            w.WriteHeader(http.StatusOK)
+            fmt.Fprintf(w, "wechat is not enabled!")
+            return
+        }
+
+        if err := wechat.DeployApplication.WechatGo(tos, content); err != nil {
+            log.Printf("<<<<==wechat== <result:%s>", err.Error())
+            w.WriteHeader(http.StatusInternalServerError)
+            fmt.Fprintf(w, err.Error())
+            return
+        }
+        log.Printf("<<<<==wechat== <result:%s>", "done")
+        w.WriteHeader(http.StatusOK)
+        fmt.Fprintf(w, "done")
+        return
+    } else {
+        log.Printf("!!!!==deploy== <result:%s>", "wrong method")
+        w.WriteHeader(http.StatusMethodNotAllowed)
+        fmt.Fprintf(w, "wrong method")
+        return
     }
 }
 
@@ -284,7 +340,7 @@ func P0(tos, content string) error {
 // Process P1 alarm message
 func P1(tos, content string) error {
     if config.CFG.WechatEnabled {
-        if err := wechat.WechatGo(config.CFG.Wechat.CorpID, config.CFG.Wechat.Secret, config.CFG.Wechat.AgentID, tos, content); err != nil {
+        if err := wechat.AlarmApplication.WechatGo(tos, content); err != nil {
             log.Printf("<<<<==wechat== <result:%s>", err.Error())
             return err
         }
@@ -342,6 +398,7 @@ func StartHTTPServer(finish <-chan bool) {
     http.HandleFunc("/health", Health)
     http.HandleFunc("/email", Email)
     http.HandleFunc("/msg", Message)
+    http.HandleFunc("/deploy", Deploy)
     http.HandleFunc("/alarm", Alarm)
 
     server := &http.Server{Addr: config.CFG.Addr}

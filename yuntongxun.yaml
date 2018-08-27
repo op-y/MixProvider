@@ -1,7 +1,7 @@
 media:
-  - key: "host"
-    filename: "hostFault.wav"
-    description: "host fault"
-  - key: "net"
-    filename: "netFault.wav"
-    description: "network fault"
+  - key: "admin"
+    filename: "test.wav"
+    description: "this is admin test"
+  - key: "sre"
+    filename: "hehe.wav"
+    description: "this is sre test"
