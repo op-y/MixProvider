@@ -26,6 +26,15 @@
         "media_name": "music.wav",
         "play_times": "1"
     },
+    "jianzhou": {
+        "account": "your_account",
+        "password": "your_password"
+    },
+    "sendcloud": {
+        "user": "username",
+        "key": "key",
+        "tplid": "666666"
+    },
     "email": {
         "ip":"127.0.0.1",
         "port": 25,
@@ -33,5 +42,6 @@
         "password": "your password",
         "ops": "sre@example.com"
     },
-    "blacklist":["10086", "10000", "10010"]
+    "blacklist":["10086", "10000", "10010"],
+    "mask":["mask1", "mask2", "mask3"]
 }

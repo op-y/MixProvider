@@ -64,3 +64,19 @@ func BlackListFilter(tos string) string {
     return strings.Join(remainList, ",")
 }
 
+// Replace commas by semicolons
+func ReplaceCommas(tos string) string {
+    return strings.Replace(tos, ",", ";", -1)
+}
+
+// Filter the content in the mask keyword list
+func ContentFilter(content string) bool {
+    if strings.Contains(content, "[OK]") {
+        for _, keyword := range config.CFG.Mask {
+            if strings.Contains(content, keyword) {
+                return true
+            }
+        }
+    }
+    return false
+}

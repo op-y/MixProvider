@@ -7,15 +7,18 @@ import (
 )
 
 type Config struct {
-    Addr             string          `json:"addr"`  
-    WechatEnabled    bool            `json:"wechat_enabled"`
-    SmsEnabled       bool            `json:"sms_enabled"`  
-    EmailEnabled     bool            `json:"email_enabled"`  
-    Wechat           WechatConfig    `json:"wechat"`
-    Sms              SmsConfig       `json:"sms"`  
-    Tel              TelConfig       `json:"tel"`  
-    Email            EmailConfig     `json:"email"`
-    BlackList        []string        `json:"blacklist"`  
+    Addr             string             `json:"addr"`  
+    WechatEnabled    bool               `json:"wechat_enabled"`
+    SmsEnabled       bool               `json:"sms_enabled"`  
+    EmailEnabled     bool               `json:"email_enabled"`  
+    Wechat           WechatConfig       `json:"wechat"`
+    Sms              SmsConfig          `json:"sms"`  
+    Tel              TelConfig          `json:"tel"`  
+    Jianzhou         JianzhouConfig     `json:"jianzhou"`  
+    Sendcloud        SendcloudConfig    `json:"sendcloud"`  
+    Email            EmailConfig        `json:"email"`
+    BlackList        []string           `json:"blacklist"`  
+    Mask             []string           `json:"mask"`  
 }
 
 type WechatConfig struct {
@@ -42,6 +45,17 @@ type TelConfig struct {
     DisplayNum    string    `json:"display_num"`
     MediaName     string    `json:"media_name"`
     PlayTimes     string    `json:"play_times"`
+}
+
+type JianzhouConfig struct {
+    Account     string    `json:"account"`
+    Password    string    `json:"password"`
+}
+
+type SendcloudConfig struct {
+    User     string    `json:"user"`
+    Key      string    `json:"key"`
+    TplID    string    `json:"tplid"`
 }
 
 type EmailConfig struct {

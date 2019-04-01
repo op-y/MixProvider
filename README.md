@@ -15,7 +15,9 @@ MixProvider 是按照Open Falcon监控系统短信报警接口规范开发的Pro
 * delayer/delayer.go       -- 报警延迟处理包
 * email/email.go           -- 邮件处理包
 * filter/filter.go         -- 过滤器包
+* jianzhou/jianzhou.go     -- 建周处理包
 * main.go                  -- 程序入口
+* sendcloud/sendcloud.go   -- SendCloud处理包
 * server/server.go         -- HTTP Server包
 * utils/message.go         -- 报警消息
 * utils/set.go             -- Map实现的Set
